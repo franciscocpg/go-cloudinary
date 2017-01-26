@@ -168,10 +168,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, fmt.Sprintf("Usage: %s [options] action settings.conf \n", os.Args[0]))
 		fmt.Fprintf(os.Stderr, `
 Actions:
-ls          list all remote resources
-rm          delete a remote resource
-up          upload a local resource
-url         get the URL of of a remote resource
+ls             list all remote resources
+rm             delete a remote resource
+up             upload a local resource
+url            get the URL of of a remote resource
+private-url    get private URL
 
 The config file is a plain text file with a [cloudinary] section, e.g
 [cloudinary]
@@ -198,7 +199,7 @@ uri=cloudinary://api_key:api_secret@cloud_name
 	action := flag.Arg(0)
 	supportedAction := func(act string) bool {
 		switch act {
-		case "ls", "rm", "up", "url":
+		case "ls", "rm", "up", "url", "private-url":
 			return true
 		}
 		return false
@@ -308,6 +309,11 @@ uri=cloudinary://api_key:api_secret@cloud_name
 		} else {
 			fmt.Println(service.Url(*optImg, rAction, cloudinary.ImageType))
 		}
+	case "private-url":
+		if *optImg == "" {
+			fail("Missing -i option.")
+		}
+		fmt.Println(service.PrivateDownloadUrl(*optImg, "png"))
 	}
 
 	fmt.Println("")
