@@ -492,8 +492,6 @@ func (s *Service) uploadFile(fullPath string, data io.Reader, randomPublicId boo
 	if resp.StatusCode == http.StatusOK {
 		// Body is JSON data and looks like:
 		// {"public_id":"Downloads/file","version":1369431906,"format":"png","resource_type":"image"}
-		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Printf("body %+v", string(body))
 		dec := json.NewDecoder(resp.Body)
 		upInfo := new(uploadResponse)
 		if err := dec.Decode(upInfo); err != nil {
@@ -521,8 +519,7 @@ func (s *Service) uploadFile(fullPath string, data io.Reader, randomPublicId boo
 		return upInfo.PublicId, nil
 	} else {
 		body, _ := ioutil.ReadAll(resp.Body)
-		fmt.Printf("body %+v", string(body))
-		return fullPath, errors.New("Request error: " + resp.Status)
+		return fullPath, fmt.Errorf("Request error: %s - %s ", resp.Status, body)
 	}
 }
 
