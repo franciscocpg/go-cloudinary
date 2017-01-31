@@ -254,27 +254,30 @@ uri=cloudinary://api_key:api_secret@cloud_name
 		if *optRaw == "" && *optImg == "" {
 			fail("Missing -i or -r option.")
 		}
-		uo := cloudinary.UploadOptions{
+		options := cloudinary.Options{
 			ResourceAction: rAction,
 			PublicId:       *optPublicId,
 		}
 		if *optRaw != "" {
 			step("Uploading as raw data")
-			if _, err := service.UploadStaticRaw(*optRaw, nil, settings.PrependPath, uo); err != nil {
+			if _, err := service.UploadStaticRaw(*optRaw, nil, settings.PrependPath, options); err != nil {
 				perror(err)
 			}
 		} else {
 			step("Uploading as images")
-			if _, err := service.UploadStaticImage(*optImg, nil, settings.PrependPath, uo); err != nil {
+			if _, err := service.UploadStaticImage(*optImg, nil, settings.PrependPath, options); err != nil {
 				perror(err)
 			}
 		}
 		break
 
 	case "rm":
+		options := cloudinary.Options{
+			ResourceAction: rAction,
+		}
 		if *optAll {
 			step(fmt.Sprintf("Deleting all resources..."))
-			if err := service.DropAll(os.Stdout); err != nil {
+			if err := service.DropAll(os.Stdout, options); err != nil {
 				perror(err)
 			}
 		} else {
@@ -283,12 +286,12 @@ uri=cloudinary://api_key:api_secret@cloud_name
 			}
 			if *optRaw != "" {
 				step(fmt.Sprintf("Deleting raw file %s", *optRaw))
-				if err := service.Delete(*optRaw, settings.PrependPath, cloudinary.RawType); err != nil {
+				if err := service.Delete(*optRaw, settings.PrependPath, cloudinary.RawType, options); err != nil {
 					perror(err)
 				}
 			} else {
 				step(fmt.Sprintf("Deleting image %s", *optImg))
-				if err := service.Delete(*optImg, settings.PrependPath, cloudinary.ImageType); err != nil {
+				if err := service.Delete(*optImg, settings.PrependPath, cloudinary.ImageType, options); err != nil {
 					perror(err)
 				}
 			}

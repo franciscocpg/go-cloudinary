@@ -27,7 +27,7 @@ const (
 	maxResults = 2048
 )
 
-func (s *Service) dropAllResources(rtype ResourceType, w io.Writer) error {
+func (s *Service) dropAllResources(rtype ResourceType, options Options, w io.Writer) error {
 	qs := url.Values{
 		"max_results": []string{strconv.FormatInt(maxResults, 10)},
 	}
@@ -46,7 +46,7 @@ func (s *Service) dropAllResources(rtype ResourceType, w io.Writer) error {
 			if w != nil {
 				fmt.Fprintf(w, "Deleting %s ... ", publicId)
 			}
-			if err := s.Delete(publicId, "", rtype); err != nil {
+			if err := s.Delete(publicId, "", rtype, options); err != nil {
 				// Do not return. Report the error but continue through the list.
 				fmt.Fprintf(w, "Error: %s: %s\n", publicId, err.Error())
 			}
@@ -63,23 +63,23 @@ func (s *Service) dropAllResources(rtype ResourceType, w io.Writer) error {
 
 // DropAllImages deletes all remote images from Cloudinary. File names are
 // written to io.Writer if available.
-func (s *Service) DropAllImages(w io.Writer) error {
-	return s.dropAllResources(ImageType, w)
+func (s *Service) DropAllImages(w io.Writer, options Options) error {
+	return s.dropAllResources(ImageType, options, w)
 }
 
 // DropAllRaws deletes all remote raw files from Cloudinary. File names are
 // written to io.Writer if available.
-func (s *Service) DropAllRaws(w io.Writer) error {
-	return s.dropAllResources(RawType, w)
+func (s *Service) DropAllRaws(w io.Writer, options Options) error {
+	return s.dropAllResources(RawType, options, w)
 }
 
 // DropAll deletes all remote resources (both images and raw files) from Cloudinary.
 // File names are written to io.Writer if available.
-func (s *Service) DropAll(w io.Writer) error {
-	if err := s.DropAllImages(w); err != nil {
+func (s *Service) DropAll(w io.Writer, options Options) error {
+	if err := s.DropAllImages(w, options); err != nil {
 		return err
 	}
-	if err := s.DropAllRaws(w); err != nil {
+	if err := s.DropAllRaws(w, options); err != nil {
 		return err
 	}
 	return nil
